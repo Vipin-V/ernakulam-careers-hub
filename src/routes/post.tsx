@@ -72,7 +72,7 @@ function PostPage() {
         <h2 className="font-display text-lg font-semibold">Your postings</h2>
         <div className="mt-4 grid gap-4">
           <JobCard
-            job={PENDING_JOBS[0]}
+            job={PENDING_JOBS[0]!}
             action={
               <span className="rounded-full bg-accent/25 px-2.5 py-1 text-xs font-medium text-accent-foreground">
                 Awaiting approval
@@ -80,7 +80,7 @@ function PostPage() {
             }
           />
           <JobCard
-            job={JOBS[0]}
+            job={JOBS[0]!}
             action={
               <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
                 Live
