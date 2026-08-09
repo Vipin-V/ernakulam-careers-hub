@@ -136,3 +136,83 @@ export const PENDING_JOBS: Job[] = [
     status: "pending",
   },
 ];
+
+export type AppStatus = "Under review" | "Shortlisted" | "Selected" | "Not selected";
+
+export const STATUS_STYLE: Record<AppStatus, string> = {
+  "Under review": "bg-muted text-muted-foreground",
+  Shortlisted: "bg-accent/25 text-accent-foreground",
+  Selected: "bg-primary/10 text-primary",
+  "Not selected": "bg-destructive/10 text-destructive",
+};
+
+export const MY_APPLICATIONS: {
+  job: Job;
+  status: AppStatus;
+  appliedOn: string;
+  note: string;
+}[] = [
+  { job: JOBS[0]!, status: "Shortlisted", appliedOn: "12 Aug", note: "HR will call you for timings." },
+  { job: JOBS[1]!, status: "Under review", appliedOn: "11 Aug", note: "Resume received." },
+  { job: JOBS[3]!, status: "Selected", appliedOn: "8 Aug", note: "Report at store on Monday, 4 PM." },
+  { job: JOBS[4]!, status: "Not selected", appliedOn: "5 Aug", note: "Position filled." },
+];
+
+export type Applicant = {
+  id: string;
+  name: string;
+  headline: string;
+  phone: string;
+  email: string;
+  area: string;
+  experience: string;
+  jobTitle: string;
+  status: AppStatus;
+};
+
+export const APPLICANTS: Applicant[] = [
+  {
+    id: "a1",
+    name: "Arjun Menon",
+    headline: "Catering assistant",
+    phone: "+91 98470 11223",
+    email: "arjun.menon@gmail.com",
+    area: "Edappally",
+    experience: "2 yrs experience",
+    jobTitle: JOBS[0]!.title,
+    status: "Shortlisted",
+  },
+  {
+    id: "a2",
+    name: "Fathima Rasheed",
+    headline: "Hotel management student",
+    phone: "+91 90372 55810",
+    email: "fathima.r@outlook.com",
+    area: "Kaloor",
+    experience: "Fresher",
+    jobTitle: JOBS[0]!.title,
+    status: "Under review",
+  },
+  {
+    id: "a3",
+    name: "Nikhil Das",
+    headline: "React developer",
+    phone: "+91 95448 90211",
+    email: "nikhil.dev@gmail.com",
+    area: "Kakkanad",
+    experience: "1 yr internship",
+    jobTitle: JOBS[1]!.title,
+    status: "Selected",
+  },
+  {
+    id: "a4",
+    name: "Sneha Thomas",
+    headline: "CS final year, MEC",
+    phone: "+91 88910 44562",
+    email: "sneha.thomas@gmail.com",
+    area: "Vyttila",
+    experience: "Fresher",
+    jobTitle: JOBS[1]!.title,
+    status: "Under review",
+  },
+];
