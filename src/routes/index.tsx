@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { JobCard } from "@/components/JobCard";
@@ -29,6 +29,8 @@ function Index() {
   const [q, setQ] = useState("");
   const [type, setType] = useState<string | null>(null);
   const [area, setArea] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const active = (type ? 1 : 0) + (area ? 1 : 0);
 
   const results = useMemo(
     () =>
@@ -76,18 +78,41 @@ function Index() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-10">
-        <div className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-2">
-          <Chip active={!type} onClick={() => setType(null)} label="All types" />
-          {JOB_TYPES.map((t) => (
-            <Chip key={t} active={type === t} onClick={() => setType(t)} label={t} />
-          ))}
-        </div>
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2">
-          <Chip active={!area} onClick={() => setArea(null)} label="All areas" />
-          {AREAS.map((a) => (
-            <Chip key={a} active={area === a} onClick={() => setArea(a)} label={a} />
-          ))}
+      <section className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className="flex w-full items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium sm:hidden"
+        >
+          <span className="inline-flex items-center gap-2">
+            <SlidersHorizontal className="h-4 w-4 text-primary" />
+            Filters{active > 0 ? ` (${active})` : ""}
+          </span>
+          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
+
+        <div className={`${open ? "grid" : "hidden"} gap-4 pt-4 sm:grid sm:pt-0`}>
+          <div>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Job type
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Chip active={!type} onClick={() => setType(null)} label="All types" />
+              {JOB_TYPES.map((t) => (
+                <Chip key={t} active={type === t} onClick={() => setType(t)} label={t} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Area
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Chip active={!area} onClick={() => setArea(null)} label="All areas" />
+              {AREAS.map((a) => (
+                <Chip key={a} active={area === a} onClick={() => setArea(a)} label={a} />
+              ))}
+            </div>
+          </div>
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">{results.length} opportunities</p>
