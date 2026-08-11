@@ -46,14 +46,14 @@ function Index() {
   return (
     <>
       <section
-        className="px-4 py-14 text-primary-foreground sm:py-20"
+        className="px-4 py-12 text-primary-foreground sm:py-20"
         style={{ background: "var(--gradient-hero)" }}
       >
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-medium">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-medium">
             <MapPin className="h-3.5 w-3.5" /> Ernakulam district only
           </span>
-          <h1 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-5xl">
+          <h1 className="mt-4 font-display text-[1.75rem] font-bold leading-tight sm:text-5xl">
             Work near you, in Kochi
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-sm opacity-85 sm:text-base">
@@ -68,20 +68,21 @@ function Index() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Job title or company"
-                className="border-0 bg-transparent px-0 text-foreground shadow-none focus-visible:ring-0"
+                className="h-11 border-0 bg-transparent px-0 text-base text-foreground shadow-none focus-visible:ring-0 sm:text-sm"
               />
             </div>
-            <Button size="lg" className="rounded-xl">
+            <Button size="lg" className="h-11 rounded-xl">
               Search
             </Button>
           </div>
         </div>
       </section>
 
+
       <section className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
         <button
           onClick={() => setOpen((o) => !o)}
-          className="flex w-full items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium sm:hidden"
+          className="flex min-h-11 w-full items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium shadow-sm sm:hidden"
         >
           <span className="inline-flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-primary" />
@@ -89,6 +90,7 @@ function Index() {
           </span>
           <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
         </button>
+
 
         <div className={`${open ? "grid" : "hidden"} gap-4 pt-4 sm:grid sm:pt-0`}>
           <div>
@@ -149,9 +151,9 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+      className={`min-h-10 shrink-0 rounded-full border px-3.5 py-2 text-sm transition-colors ${
         active
-          ? "border-primary bg-primary text-primary-foreground"
+          ? "border-primary bg-primary text-primary-foreground shadow-sm"
           : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground"
       }`}
     >
