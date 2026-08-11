@@ -74,7 +74,7 @@ function JobDetailPage() {
         <List title="What you'll do" items={detail.duties} />
         <List title="Requirements" items={detail.requirements} />
         <div className="flex flex-wrap gap-2">
-          {job.tags.map((t) => (
+          {job.tags.map((t: string) => (
             <span key={t} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
               {t}
             </span>
