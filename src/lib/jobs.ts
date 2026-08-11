@@ -216,3 +216,53 @@ export const APPLICANTS: Applicant[] = [
     status: "Under review",
   },
 ];
+
+export const ALL_JOBS = [...JOBS, ...PENDING_JOBS];
+export const getJob = (id: string) => ALL_JOBS.find((j) => j.id === id);
+
+export type JobDetail = {
+  about: string;
+  duties: string[];
+  requirements: string[];
+  shift: string;
+  openings: number;
+  contact: string;
+};
+
+const FALLBACK: JobDetail = {
+  about: "A verified local opening in Ernakulam. The employer will share exact site details after shortlisting.",
+  duties: ["Report on time at the assigned location", "Follow the supervisor's instructions", "Maintain workplace safety and hygiene"],
+  requirements: ["Age 18+", "Valid ID proof", "Basic Malayalam or English"],
+  shift: "Discussed at interview",
+  openings: 2,
+  contact: "hr@kochiworks.in",
+};
+
+export const JOB_DETAILS: Record<string, Partial<JobDetail>> = {
+  "1": {
+    about: "Malabar Caterers is hiring service staff for the wedding season across Ernakulam venues. Food and travel within the district are covered.",
+    duties: ["Set up buffet counters and seating", "Serve guests during the function", "Clear and pack up after the event"],
+    requirements: ["Neat appearance", "Ability to stand for long hours", "Previous catering work is a plus"],
+    shift: "4 PM – 11 PM",
+    openings: 12,
+    contact: "+91 98470 22110",
+  },
+  "2": {
+    about: "Infopark Labs offers a 6-month paid frontend internship with mentorship and a possible full-time offer.",
+    duties: ["Build UI components in React", "Fix bugs and write tests", "Join daily stand-ups"],
+    requirements: ["JavaScript and React basics", "Git knowledge", "Final-year student or fresher"],
+    shift: "Mon–Fri, 9:30 AM – 6 PM",
+    openings: 3,
+    contact: "careers@infoparklabs.in",
+  },
+  "3": {
+    about: "Backwater Events needs a setup crew for weekend shows around Fort Kochi.",
+    duties: ["Load and unload equipment", "Assemble stage and lighting rigs", "Dismantle after the show"],
+    requirements: ["Physically fit", "Comfortable with night shifts"],
+    shift: "6 PM – 2 AM",
+    openings: 8,
+    contact: "+91 90480 71234",
+  },
+};
+
+export const jobDetail = (id: string): JobDetail => ({ ...FALLBACK, ...(JOB_DETAILS[id] ?? {}) });
