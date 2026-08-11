@@ -141,7 +141,7 @@ export type AppStatus = "Under review" | "Shortlisted" | "Selected" | "Not selec
 
 export const STATUS_STYLE: Record<AppStatus, string> = {
   "Under review": "bg-muted text-muted-foreground",
-  Shortlisted: "bg-accent/25 text-accent-foreground",
+  Shortlisted: "bg-secondary text-secondary-foreground",
   Selected: "bg-primary/10 text-primary",
   "Not selected": "bg-destructive/10 text-destructive",
 };
