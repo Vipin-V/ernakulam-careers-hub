@@ -3,7 +3,7 @@ import { Briefcase, Menu, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { useRole, setRole, ROLE_LABEL, type Role } from "@/lib/auth";
+import { useRole, useSession, signOut as authSignOut, ROLE_LABEL, type Role } from "@/lib/auth";
 
 const NAV: { to: string; label: string; roles: (Role | "guest")[] }[] = [
   { to: "/", label: "Find jobs", roles: ["guest", "seeker", "hr", "admin"] },
@@ -15,12 +15,13 @@ const NAV: { to: string; label: string; roles: (Role | "guest")[] }[] = [
 
 export function SiteHeader() {
   const role = useRole();
+  const session = useSession();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const items = NAV.filter((n) => n.roles.includes(role ?? "guest"));
 
-  const signOut = () => {
-    setRole(null);
+  const signOut = async () => {
+    await authSignOut();
     setOpen(false);
     navigate({ to: "/" });
   };
@@ -47,7 +48,7 @@ export function SiteHeader() {
               {n.label}
             </Link>
           ))}
-          {role ? (
+          {session ? (
             <Button size="sm" variant="ghost" className="rounded-full" onClick={signOut}>
               <LogOut className="h-4 w-4" /> Sign out
             </Button>
@@ -67,7 +68,7 @@ export function SiteHeader() {
           </SheetTrigger>
           <SheetContent side="right" className="w-[82vw] max-w-xs p-6">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {role ? ROLE_LABEL[role] : "Browsing as guest"}
+              {session ? (role ? ROLE_LABEL[role] : "Signed in") : "Browsing as guest"}
             </p>
             <nav className="mt-5 grid gap-1 text-base">
               {items.map((n) => (
@@ -83,7 +84,7 @@ export function SiteHeader() {
               ))}
             </nav>
             <div className="mt-6">
-              {role ? (
+              {session ? (
                 <Button variant="outline" className="w-full rounded-xl" onClick={signOut}>
                   <LogOut className="h-4 w-4" /> Sign out
                 </Button>

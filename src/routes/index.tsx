@@ -122,9 +122,7 @@ function Index() {
               key={job.id}
               job={job}
               action={
-                <Button size="sm" variant="secondary" className="rounded-full">
-                  Apply
-                </Button>
+                <span className="text-sm font-medium text-primary">View details →</span>
               }
             />
           ))}
