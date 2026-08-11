@@ -74,7 +74,7 @@ function PostPage() {
           <JobCard
             job={PENDING_JOBS[0]!}
             action={
-              <span className="rounded-full bg-accent/25 px-2.5 py-1 text-xs font-medium text-accent-foreground">
+              <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
                 Awaiting approval
               </span>
             }

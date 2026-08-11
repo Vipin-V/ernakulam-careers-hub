@@ -34,9 +34,9 @@ function ApplicantsPage() {
           <button
             key={j}
             onClick={() => setJob(j)}
-            className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+            className={`min-h-10 rounded-full border px-3.5 py-2 text-sm transition-colors ${
               job === j
-                ? "border-primary bg-primary text-primary-foreground"
+                ? "border-primary bg-primary text-primary-foreground shadow-sm"
                 : "border-border bg-card text-muted-foreground hover:border-primary/40"
             }`}
           >
@@ -44,6 +44,7 @@ function ApplicantsPage() {
           </button>
         ))}
       </div>
+
 
       <div className="mt-6 grid gap-4">
         {list.map((a) => (
@@ -71,17 +72,18 @@ function ApplicantsPage() {
               </span>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" className="rounded-full">
+            <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+              <Button size="sm" variant="outline" className="col-span-2 h-10 rounded-full">
                 <FileText className="h-4 w-4" /> Resume
               </Button>
-              <Button size="sm" variant="secondary" className="rounded-full">
+              <Button size="sm" variant="secondary" className="h-10 rounded-full">
                 Shortlist
               </Button>
-              <Button size="sm" className="rounded-full">
+              <Button size="sm" className="h-10 rounded-full">
                 Select
               </Button>
             </div>
+
           </article>
         ))}
       </div>
