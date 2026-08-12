@@ -15,6 +15,7 @@ import { Route as ApplicantsRouteImport } from './routes/applicants'
 import { Route as ApplicationsRouteImport } from './routes/applications'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PostRouteImport } from './routes/post'
+import { Route as SavedRouteImport } from './routes/saved'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const PostRoute = PostRouteImport.update({
   path: '/post',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsIdRoute = JobsIdRouteImport.update({
   id: '/jobs/$id',
   path: '/jobs/$id',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/applications': typeof ApplicationsRoute
   '/login': typeof LoginRoute
   '/post': typeof PostRoute
+  '/saved': typeof SavedRoute
   '/jobs/$id': typeof JobsIdRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/applications': typeof ApplicationsRoute
   '/login': typeof LoginRoute
   '/post': typeof PostRoute
+  '/saved': typeof SavedRoute
   '/jobs/$id': typeof JobsIdRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/applications': typeof ApplicationsRoute
   '/login': typeof LoginRoute
   '/post': typeof PostRoute
+  '/saved': typeof SavedRoute
   '/jobs/$id': typeof JobsIdRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/applications'
     | '/login'
     | '/post'
+    | '/saved'
     | '/jobs/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/applications'
     | '/login'
     | '/post'
+    | '/saved'
     | '/jobs/$id'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/applications'
     | '/login'
     | '/post'
+    | '/saved'
     | '/jobs/$id'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   ApplicationsRoute: typeof ApplicationsRoute
   LoginRoute: typeof LoginRoute
   PostRoute: typeof PostRoute
+  SavedRoute: typeof SavedRoute
   JobsIdRoute: typeof JobsIdRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs/$id': {
       id: '/jobs/$id'
       path: '/jobs/$id'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApplicationsRoute: ApplicationsRoute,
   LoginRoute: LoginRoute,
   PostRoute: PostRoute,
+  SavedRoute: SavedRoute,
   JobsIdRoute: JobsIdRoute,
 }
 export const routeTree = rootRouteImport
