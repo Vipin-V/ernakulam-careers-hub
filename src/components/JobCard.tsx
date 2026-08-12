@@ -49,6 +49,8 @@ export function JobCard({ job, action }: { job: Job; action?: React.ReactNode })
           <div className="ml-auto">{action}</div>
         </div>
       </article>
-    </Link>
+      </Link>
+    </div>
   );
 }
+
