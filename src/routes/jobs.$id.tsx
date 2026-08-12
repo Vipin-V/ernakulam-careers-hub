@@ -3,6 +3,7 @@ import { MapPin, Wallet, Clock, Users, CalendarClock, Phone, ArrowLeft, CheckCir
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getJob, jobDetail } from "@/lib/jobs";
+import { SaveButton } from "@/components/SaveButton";
 
 export const Route = createFileRoute("/jobs/$id")({
   loader: ({ params }) => {
@@ -50,9 +51,12 @@ function JobDetailPage() {
       </Link>
 
       <header className="mt-4 rounded-2xl border border-border bg-card p-5">
-        <Badge variant="secondary" className="rounded-full">
-          {job.type}
-        </Badge>
+        <div className="flex items-start justify-between gap-3">
+          <Badge variant="secondary" className="rounded-full">
+            {job.type}
+          </Badge>
+          <SaveButton id={job.id} />
+        </div>
         <h1 className="mt-3 font-display text-2xl font-bold leading-snug sm:text-3xl">{job.title}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{job.company}</p>
 
