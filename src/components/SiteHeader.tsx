@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useRole, useSession, signOut as authSignOut, ROLE_LABEL, type Role } from "@/lib/auth";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const NAV: { to: string; label: string; roles: (Role | "guest")[] }[] = [
   { to: "/", label: "Find jobs", roles: ["guest", "seeker", "hr", "admin"] },
@@ -49,6 +50,7 @@ export function SiteHeader() {
               {n.label}
             </Link>
           ))}
+          <NotificationBell />
           {session ? (
             <Button size="sm" variant="ghost" className="rounded-full" onClick={signOut}>
               <LogOut className="h-4 w-4" /> Sign out
@@ -61,12 +63,15 @@ export function SiteHeader() {
         </nav>
 
         {/* Mobile */}
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild className="md:hidden">
-            <Button size="icon" variant="ghost" aria-label="Open menu">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
+        <div className="flex items-center gap-1 md:hidden">
+          <NotificationBell />
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button size="icon" variant="ghost" aria-label="Open menu">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+
           <SheetContent side="right" className="w-[82vw] max-w-xs p-6">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               {session ? (role ? ROLE_LABEL[role] : "Signed in") : "Browsing as guest"}
@@ -96,7 +101,9 @@ export function SiteHeader() {
               )}
             </div>
           </SheetContent>
-        </Sheet>
+          </Sheet>
+        </div>
+
       </div>
     </header>
   );
