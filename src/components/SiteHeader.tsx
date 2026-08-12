@@ -7,6 +7,7 @@ import { useRole, useSession, signOut as authSignOut, ROLE_LABEL, type Role } fr
 
 const NAV: { to: string; label: string; roles: (Role | "guest")[] }[] = [
   { to: "/", label: "Find jobs", roles: ["guest", "seeker", "hr", "admin"] },
+  { to: "/saved", label: "Saved", roles: ["guest", "seeker"] },
   { to: "/applications", label: "My applications", roles: ["seeker"] },
   { to: "/post", label: "Post a job", roles: ["hr"] },
   { to: "/applicants", label: "Applicants", roles: ["hr"] },
