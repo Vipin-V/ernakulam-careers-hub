@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useRole, useSession, signOut as authSignOut, ROLE_LABEL, type Role } from "@/lib/auth";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const NAV: { to: string; label: string; roles: (Role | "guest")[] }[] = [
   { to: "/", label: "Find jobs", roles: ["guest", "seeker", "hr", "admin"] },
