@@ -6,7 +6,7 @@ const ROLES: Role[] = ["seeker", "hr", "admin"];
 
 export const Route = createFileRoute("/signin")({
   validateSearch: (search: Record<string, unknown>): { role: Role } => ({
-    role: ROLES.includes(search.role as Role) ? (search.role as Role) : "seeker",
+    role: ROLES.includes(search['role'] as Role) ? (search['role'] as Role) : "seeker",
   }),
   head: () => ({
     meta: [
