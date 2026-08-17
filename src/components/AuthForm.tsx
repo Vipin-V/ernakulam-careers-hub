@@ -19,6 +19,7 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const meta = ROLE_META[role];
   const Icon = meta.icon;
 
