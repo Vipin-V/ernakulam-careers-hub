@@ -52,6 +52,7 @@ export function SiteHeader() {
             </Link>
           ))}
           <NotificationBell />
+          <ThemeToggle />
           {session ? (
             <Button size="sm" variant="ghost" className="rounded-full" onClick={signOut}>
               <LogOut className="h-4 w-4" /> Sign out
