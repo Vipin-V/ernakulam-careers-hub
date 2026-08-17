@@ -16,6 +16,8 @@ import { Route as ApplicationsRouteImport } from './routes/applications'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as SavedRouteImport } from './routes/saved'
+import { Route as SigninRouteImport } from './routes/signin'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 
@@ -54,6 +56,16 @@ const SavedRoute = SavedRouteImport.update({
   path: '/saved',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -73,6 +85,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/post': typeof PostRoute
   '/saved': typeof SavedRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/jobs/$id': typeof JobsIdRoute
 }
@@ -84,6 +98,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/post': typeof PostRoute
   '/saved': typeof SavedRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/jobs/$id': typeof JobsIdRoute
 }
@@ -96,6 +112,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/post': typeof PostRoute
   '/saved': typeof SavedRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/jobs/$id': typeof JobsIdRoute
 }
@@ -109,6 +127,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/post'
     | '/saved'
+    | '/signin'
+    | '/signup'
     | '/auth/callback'
     | '/jobs/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +140,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/post'
     | '/saved'
+    | '/signin'
+    | '/signup'
     | '/auth/callback'
     | '/jobs/$id'
   id:
@@ -131,6 +153,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/post'
     | '/saved'
+    | '/signin'
+    | '/signup'
     | '/auth/callback'
     | '/jobs/$id'
   fileRoutesById: FileRoutesById
@@ -143,6 +167,8 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PostRoute: typeof PostRoute
   SavedRoute: typeof SavedRoute
+  SigninRoute: typeof SigninRoute
+  SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   JobsIdRoute: typeof JobsIdRoute
 }
@@ -198,6 +224,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SavedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -223,6 +263,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PostRoute: PostRoute,
   SavedRoute: SavedRoute,
+  SigninRoute: SigninRoute,
+  SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   JobsIdRoute: JobsIdRoute,
 }
