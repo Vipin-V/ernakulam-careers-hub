@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Briefcase, ShieldCheck, User, Loader2 } from "lucide-react";
+import { Briefcase, ShieldCheck, User, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
