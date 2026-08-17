@@ -69,22 +69,6 @@ function LoginPage() {
     }
   };
 
-  const google = async () => {
-    setBusy(true);
-    setRole(selected);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(active.to)}`,
-        queryParams: { prompt: "select_account" },
-      },
-    });
-    if (error) {
-      setBusy(false);
-      toast.error(error.message);
-    }
-  };
-
   return (
     <div className="mx-auto max-w-md px-4 py-10 sm:py-16">
       <h1 className="font-display text-2xl font-bold sm:text-3xl">
@@ -146,14 +130,6 @@ function LoginPage() {
         <Button type="submit" size="lg" className="rounded-xl" disabled={busy}>
           {busy && <Loader2 className="h-4 w-4 animate-spin" />}
           {mode === "signin" ? `Sign in as ${active.label}` : `Sign up as ${active.label}`}
-        </Button>
-
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <Button type="button" variant="outline" size="lg" className="rounded-xl" onClick={google} disabled={busy}>
-          Continue with Google
         </Button>
       </form>
 
