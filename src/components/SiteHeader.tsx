@@ -67,6 +67,7 @@ export function SiteHeader() {
         {/* Mobile */}
         <div className="flex items-center gap-1 md:hidden">
           <NotificationBell />
+          <ThemeToggle />
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button size="icon" variant="ghost" aria-label="Open menu">
