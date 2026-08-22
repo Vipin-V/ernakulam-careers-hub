@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { setRole, type Role } from "@/lib/auth";
+import type { Role } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const ROLE_META: Record<Role, { label: string; hint: string; icon: typeof User; to: string }> = {
@@ -42,7 +42,6 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-      setRole(role);
       navigate({ to: meta.to });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");

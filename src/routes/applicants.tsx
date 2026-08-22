@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Mail, Phone, MapPin, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { APPLICANTS, STATUS_STYLE } from "@/lib/jobs";
+import { useRequireRole } from "@/lib/auth";
 
 export const Route = createFileRoute("/applicants")({
   head: () => ({
@@ -20,9 +21,11 @@ export const Route = createFileRoute("/applicants")({
 });
 
 function ApplicantsPage() {
+  const authorized = useRequireRole(["hr"]);
   const jobs = [...new Set(APPLICANTS.map((a) => a.jobTitle))];
   const [job, setJob] = useState(jobs[0]!);
   const list = APPLICANTS.filter((a) => a.jobTitle === job);
+  if (!authorized) return null;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:py-10">

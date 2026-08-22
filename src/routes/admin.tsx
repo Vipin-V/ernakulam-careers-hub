@@ -4,6 +4,7 @@ import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JobCard } from "@/components/JobCard";
 import { PENDING_JOBS, JOBS } from "@/lib/jobs";
+import { useRequireRole } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -24,8 +25,10 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
+  const authorized = useRequireRole(["admin"]);
   const [queue, setQueue] = useState(PENDING_JOBS);
   const remove = (id: string) => setQueue((p) => p.filter((j) => j.id !== id));
+  if (!authorized) return null;
 
   const stats = [
     { label: "Pending review", value: queue.length },

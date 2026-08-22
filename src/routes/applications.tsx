@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { JobCard } from "@/components/JobCard";
 import { MY_APPLICATIONS, STATUS_STYLE } from "@/lib/jobs";
+import { useRequireRole } from "@/lib/auth";
 
 export const Route = createFileRoute("/applications")({
   head: () => ({
@@ -18,6 +19,9 @@ export const Route = createFileRoute("/applications")({
 });
 
 function ApplicationsPage() {
+  const authorized = useRequireRole(["seeker"]);
+  if (!authorized) return null;
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:py-10">
       <h1 className="font-display text-2xl font-bold sm:text-3xl">My applications</h1>

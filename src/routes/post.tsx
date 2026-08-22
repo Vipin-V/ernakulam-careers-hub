@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { JobCard } from "@/components/JobCard";
 import { JOB_TYPES, AREAS, PENDING_JOBS, JOBS } from "@/lib/jobs";
+import { useRequireRole } from "@/lib/auth";
 
 export const Route = createFileRoute("/post")({
   head: () => ({
@@ -25,6 +26,9 @@ export const Route = createFileRoute("/post")({
 });
 
 function PostPage() {
+  const authorized = useRequireRole(["hr"]);
+  if (!authorized) return null;
+
   return (
     <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[minmax(0,1fr)_380px]">
       <section>
