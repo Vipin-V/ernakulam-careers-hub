@@ -46,11 +46,11 @@ function Index() {
   return (
     <>
       <section
-        className="px-4 py-12 text-primary-foreground sm:py-20"
+        className="px-4 py-12 text-white sm:py-20"
         style={{ background: "var(--gradient-hero)" }}
       >
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-medium">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-medium">
             <MapPin className="h-3.5 w-3.5" /> Ernakulam district only
           </span>
           <h1 className="mt-4 font-display text-[1.75rem] font-bold leading-tight sm:text-5xl">
