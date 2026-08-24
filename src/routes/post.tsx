@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { Building2, FileCheck2 } from "lucide-react";
 import { JobCard } from "@/components/JobCard";
 import { JOB_TYPES, AREAS, dbJobToJob, type JobType } from "@/lib/jobs";
-import { useRequireRole, useSession } from "@/lib/auth";
+import { useRequireRole, useSession, useCompany } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/post")({
@@ -41,10 +43,10 @@ function PostPage() {
   const authorized = useRequireRole(["hr"]);
   const session = useSession();
   const userId = session?.user.id;
+  const company = useCompany();
   const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
-  const [company, setCompany] = useState("");
   const [type, setType] = useState<JobType>(JOB_TYPES[0]!);
   const [area, setArea] = useState(AREAS[0]!);
   const [pay, setPay] = useState("");
@@ -52,6 +54,7 @@ function PostPage() {
   const [shift, setShift] = useState("");
   const [contact, setContact] = useState("");
   const [about, setAbout] = useState("");
+  const [requiresResume, setRequiresResume] = useState(false);
 
   const { data: myJobs = [], isPending: jobsPending } = useQuery({
     queryKey: ["myJobs", userId],
@@ -71,7 +74,7 @@ function PostPage() {
     mutationFn: async () => {
       const { error } = await supabase.from("jobs").insert({
         title,
-        company,
+        company: company!,
         type,
         area,
         pay,
@@ -80,18 +83,19 @@ function PostPage() {
         contact,
         about,
         posted_by: userId!,
+        requires_resume: requiresResume,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       toast.success("Submitted for approval");
       setTitle("");
-      setCompany("");
       setPay("");
       setOpenings("1");
       setShift("");
       setContact("");
       setAbout("");
+      setRequiresResume(false);
       queryClient.invalidateQueries({ queryKey: ["myJobs", userId] });
     },
     onError: (err) => toast.error(err instanceof Error ? err.message : "Something went wrong"),
@@ -123,12 +127,13 @@ function PostPage() {
             />
           </Field>
           <Field label="Company / organiser">
-            <Input
-              required
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              placeholder="e.g. Malabar Caterers"
-            />
+            <div className="flex h-9 items-center gap-2 rounded-md border border-dashed border-input bg-muted/40 px-3 text-sm text-foreground">
+              <Building2 className="h-4 w-4 shrink-0 text-primary" />
+              {company ?? "Loading your registered company…"}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              From your HR registration — can't be edited here.
+            </p>
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Job type">
@@ -183,10 +188,26 @@ function PostPage() {
               placeholder="Timings, requirements, contact details…"
             />
           </Field>
+          <label className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 p-4">
+            <Switch
+              checked={requiresResume}
+              onCheckedChange={setRequiresResume}
+              className="mt-0.5"
+            />
+            <span className="grid gap-0.5">
+              <span className="inline-flex items-center gap-1.5 text-sm font-medium">
+                <FileCheck2 className="h-4 w-4 text-primary" />
+                Require CV / resume to apply
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Job seekers must attach a resume before they can submit an application.
+              </span>
+            </span>
+          </label>
           <Button
             type="submit"
             size="lg"
-            disabled={submitJob.isPending}
+            disabled={submitJob.isPending || !company}
             className="rounded-xl justify-self-start"
           >
             {submitJob.isPending && <Loader2 className="h-4 w-4 animate-spin" />}

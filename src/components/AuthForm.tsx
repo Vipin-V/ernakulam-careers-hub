@@ -8,7 +8,10 @@ import { Button } from "@/components/ui/button";
 import type { Role } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
-export const ROLE_META: Record<Role, { label: string; hint: string; icon: typeof User; to: string }> = {
+export const ROLE_META: Record<
+  Role,
+  { label: string; hint: string; icon: typeof User; to: string }
+> = {
   seeker: { label: "Job seeker", hint: "Apply and track status", icon: User, to: "/" },
   hr: { label: "HR / Employer", hint: "Post jobs, view applicants", icon: Briefcase, to: "/post" },
   admin: { label: "Admin", hint: "Approve postings", icon: ShieldCheck, to: "/admin" },
@@ -18,10 +21,12 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [company, setCompany] = useState("");
   const [busy, setBusy] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const meta = ROLE_META[role];
   const Icon = meta.icon;
+  const isHrSignup = mode === "signup" && role === "hr";
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,12 +36,21 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin, data: { role } },
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: isHrSignup ? { role, company } : { role },
+          },
         });
         if (error) throw error;
         if (!data.session) {
           toast.success("Check your email to confirm your account.");
           return;
+        }
+        if (isHrSignup) {
+          const { error: companyError } = await supabase.rpc("set_own_company", {
+            _company: company,
+          });
+          if (companyError) throw companyError;
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -69,7 +83,25 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
         </Link>
       </div>
 
-      <form className="mt-5 grid gap-4 rounded-2xl border border-border bg-card p-5" onSubmit={submit}>
+      <form
+        className="mt-5 grid gap-4 rounded-2xl border border-border bg-card p-5"
+        onSubmit={submit}
+      >
+        {isHrSignup && (
+          <div className="grid gap-2">
+            <Label htmlFor="company">Company / organization</Label>
+            <Input
+              id="company"
+              required
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              placeholder="e.g. Malabar Caterers"
+            />
+            <p className="text-xs text-muted-foreground">
+              Shown on every job you post — it can't be changed per listing.
+            </p>
+          </div>
+        )}
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input

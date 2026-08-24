@@ -12,14 +12,17 @@ export type Database = {
         Row: {
           role: Database["public"]["Enums"]["app_role"];
           user_id: string;
+          company: string | null;
         };
         Insert: {
           role?: Database["public"]["Enums"]["app_role"];
           user_id: string;
+          company?: string | null;
         };
         Update: {
           role?: Database["public"]["Enums"]["app_role"];
           user_id?: string;
+          company?: string | null;
         };
         Relationships: [];
       };
@@ -41,6 +44,7 @@ export type Database = {
           status: string;
           posted_by: string;
           created_at: string;
+          requires_resume: boolean;
         };
         Insert: {
           id?: string;
@@ -59,6 +63,7 @@ export type Database = {
           status?: string;
           posted_by: string;
           created_at?: string;
+          requires_resume?: boolean;
         };
         Update: {
           id?: string;
@@ -77,6 +82,7 @@ export type Database = {
           status?: string;
           posted_by?: string;
           created_at?: string;
+          requires_resume?: boolean;
         };
         Relationships: [];
       };
@@ -91,6 +97,7 @@ export type Database = {
           applicant_name: string;
           applicant_phone: string;
           applicant_email: string;
+          resume_url: string | null;
         };
         Insert: {
           id?: string;
@@ -102,6 +109,7 @@ export type Database = {
           applicant_name?: string;
           applicant_phone?: string;
           applicant_email?: string;
+          resume_url?: string | null;
         };
         Update: {
           id?: string;
@@ -113,6 +121,7 @@ export type Database = {
           applicant_name?: string;
           applicant_phone?: string;
           applicant_email?: string;
+          resume_url?: string | null;
         };
         Relationships: [
           {
@@ -191,6 +200,12 @@ export type Database = {
           _user_id: string;
         };
         Returns: boolean;
+      };
+      set_own_company: {
+        Args: {
+          _company: string;
+        };
+        Returns: undefined;
       };
     };
     Enums: {

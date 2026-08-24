@@ -28,11 +28,24 @@ function CallbackPage() {
 
     const go = () => navigate({ to: next, replace: true });
 
+    const syncCompany = (session: { user: { user_metadata?: Record<string, unknown> } }) => {
+      const company = session.user.user_metadata?.["company"];
+      if (typeof company === "string" && company) {
+        void supabase.rpc("set_own_company", { _company: company });
+      }
+    };
+
     const { data } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) go();
+      if (session) {
+        syncCompany(session);
+        go();
+      }
     });
     supabase.auth.getSession().then(({ data: d }) => {
-      if (d.session) go();
+      if (d.session) {
+        syncCompany(d.session);
+        go();
+      }
     });
 
     const timeout = setTimeout(() => navigate({ to: "/login", replace: true }), 8000);

@@ -1,11 +1,22 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, X } from "lucide-react";
+import { Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { JobCard } from "@/components/JobCard";
-import { dbJobToJob } from "@/lib/jobs";
+import { dbJobToJob, type Job } from "@/lib/jobs";
 import { useRequireRole } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -30,6 +41,7 @@ export const Route = createFileRoute("/admin")({
 function AdminPage() {
   const authorized = useRequireRole(["admin"]);
   const queryClient = useQueryClient();
+  const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
 
   const { data: pendingJobs = [], isPending: queuePending } = useQuery({
     queryKey: ["adminJobs", "pending"],
@@ -39,6 +51,19 @@ function AdminPage() {
         .select("*")
         .eq("status", "pending")
         .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data.map(dbJobToJob);
+    },
+  });
+
+  const { data: liveJobs = [], isPending: livePending } = useQuery({
+    queryKey: ["adminJobs", "approved"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data.map(dbJobToJob);
     },
@@ -71,6 +96,22 @@ function AdminPage() {
     onSuccess: (_data, { status }) => {
       toast.success(status === "approved" ? "Job approved" : "Job rejected");
       queryClient.invalidateQueries({ queryKey: ["adminJobs", "pending"] });
+      queryClient.invalidateQueries({ queryKey: ["adminJobs", "approved"] });
+      queryClient.invalidateQueries({ queryKey: ["adminStats"] });
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Something went wrong"),
+  });
+
+  const deleteJob = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("jobs").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Job deleted");
+      setJobToDelete(null);
+      queryClient.invalidateQueries({ queryKey: ["adminJobs", "pending"] });
+      queryClient.invalidateQueries({ queryKey: ["adminJobs", "approved"] });
       queryClient.invalidateQueries({ queryKey: ["adminStats"] });
     },
     onError: (err) => toast.error(err instanceof Error ? err.message : "Something went wrong"),
@@ -140,6 +181,19 @@ function AdminPage() {
                   >
                     <Check className="h-4 w-4" /> Approve
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    disabled={deleteJob.isPending}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setJobToDelete(job);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               }
             />
@@ -149,6 +203,76 @@ function AdminPage() {
       {!queuePending && pendingJobs.length === 0 && (
         <p className="py-16 text-center text-sm text-muted-foreground">Queue is clear. </p>
       )}
+
+      <h2 className="mt-12 font-display text-xl font-bold sm:text-2xl">Live jobs</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Already approved and visible to job seekers — remove anything fake or reported here.
+      </p>
+
+      {livePending ? (
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-44 rounded-2xl" />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {liveJobs.map((job) => (
+            <JobCard
+              key={job.id}
+              job={job}
+              action={
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  disabled={deleteJob.isPending}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setJobToDelete(job);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" /> Delete
+                </Button>
+              }
+            />
+          ))}
+        </div>
+      )}
+      {!livePending && liveJobs.length === 0 && (
+        <p className="py-16 text-center text-sm text-muted-foreground">No live jobs yet.</p>
+      )}
+
+      <AlertDialog open={!!jobToDelete} onOpenChange={(open) => !open && setJobToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this job?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {jobToDelete && (
+                <>
+                  This permanently removes <strong>{jobToDelete.title}</strong> at{" "}
+                  {jobToDelete.company}, along with any applications against it. This can't be
+                  undone.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteJob.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (jobToDelete) deleteJob.mutate(jobToDelete.id);
+              }}
+            >
+              Delete job
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

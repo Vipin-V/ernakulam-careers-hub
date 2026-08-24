@@ -37,6 +37,30 @@ export function useRole() {
   return session ? (data ?? null) : null;
 }
 
+/** The signed-in HR user's registered company/organization name, set at
+ * sign-up. Used to auto-fill the "posted by" company on job listings so HR
+ * can't post under a different, unverified company name. */
+export function useCompany() {
+  const session = useSession();
+  const userId = session?.user.id;
+
+  const { data } = useQuery({
+    queryKey: ["company", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("company")
+        .eq("user_id", userId!)
+        .single();
+      if (error) throw error;
+      return data.company;
+    },
+    enabled: !!userId,
+  });
+
+  return data ?? null;
+}
+
 /** Redirects to /login unless the signed-in user's real (DB-verified) role is in `allowed`.
  * Returns true once access is confirmed, so callers can gate rendering until then. */
 export function useRequireRole(allowed: Role[]) {

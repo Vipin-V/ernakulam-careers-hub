@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,6 +26,34 @@ export const Route = createFileRoute("/applicants")({
 });
 
 type ApplicantRow = Tables<"applications"> & { jobs: DbJob };
+
+function ResumeLink({ path }: { path: string }) {
+  const [loading, setLoading] = useState(false);
+
+  const open = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.storage.from("resumes").createSignedUrl(path, 60);
+    setLoading(false);
+    if (error || !data) {
+      toast.error("Couldn't open resume");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
+  return (
+    <Button
+      size="sm"
+      variant="secondary"
+      className="h-10 rounded-full"
+      onClick={open}
+      disabled={loading}
+    >
+      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+      View resume
+    </Button>
+  );
+}
 
 function ApplicantsPage() {
   const authorized = useRequireRole(["hr"]);
@@ -125,6 +153,7 @@ function ApplicantsPage() {
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
+                {a.resume_url && <ResumeLink path={a.resume_url} />}
                 <Button
                   size="sm"
                   variant="secondary"

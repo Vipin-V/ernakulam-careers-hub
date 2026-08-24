@@ -14,6 +14,7 @@ export type Job = {
   posted: string;
   tags: string[];
   status: "pending" | "approved" | "rejected";
+  requiresResume: boolean;
 };
 
 export type DbJob = Tables<"jobs">;
@@ -29,6 +30,7 @@ export function dbJobToJob(row: DbJob): Job {
     posted: formatDistanceToNow(new Date(row.created_at), { addSuffix: true }),
     tags: row.tags,
     status: row.status as Job["status"],
+    requiresResume: row.requires_resume,
   };
 }
 
@@ -74,6 +76,7 @@ export const JOBS: Job[] = [
     posted: "2h ago",
     tags: ["Immediate", "Food provided"],
     status: "approved",
+    requiresResume: false,
   },
   {
     id: "2",
@@ -85,6 +88,7 @@ export const JOBS: Job[] = [
     posted: "5h ago",
     tags: ["React", "6 months"],
     status: "approved",
+    requiresResume: false,
   },
   {
     id: "3",
@@ -96,6 +100,7 @@ export const JOBS: Job[] = [
     posted: "1d ago",
     tags: ["Weekend", "Night shift"],
     status: "approved",
+    requiresResume: false,
   },
   {
     id: "4",
@@ -107,6 +112,7 @@ export const JOBS: Job[] = [
     posted: "1d ago",
     tags: ["Evening shift"],
     status: "approved",
+    requiresResume: false,
   },
   {
     id: "5",
@@ -118,6 +124,7 @@ export const JOBS: Job[] = [
     posted: "2d ago",
     tags: ["Physical work"],
     status: "approved",
+    requiresResume: false,
   },
   {
     id: "6",
@@ -129,6 +136,7 @@ export const JOBS: Job[] = [
     posted: "3d ago",
     tags: ["Tally", "2+ yrs"],
     status: "approved",
+    requiresResume: false,
   },
 ];
 
@@ -143,6 +151,7 @@ export const PENDING_JOBS: Job[] = [
     posted: "20m ago",
     tags: ["Bulk hiring"],
     status: "pending",
+    requiresResume: false,
   },
   {
     id: "p2",
@@ -154,6 +163,7 @@ export const PENDING_JOBS: Job[] = [
     posted: "1h ago",
     tags: ["Remote friendly"],
     status: "pending",
+    requiresResume: false,
   },
   {
     id: "p3",
@@ -165,6 +175,7 @@ export const PENDING_JOBS: Job[] = [
     posted: "3h ago",
     tags: ["Own bike"],
     status: "pending",
+    requiresResume: false,
   },
 ];
 
