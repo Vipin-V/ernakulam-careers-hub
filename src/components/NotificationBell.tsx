@@ -3,12 +3,10 @@ import { Link } from "@tanstack/react-router";
 import { Bell, CheckCheck } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { useRole } from "@/lib/auth";
 import { useNotifications } from "@/lib/notifications";
 
 export function NotificationBell() {
-  const role = useRole();
-  const { items, unread, markRead, markAllRead } = useNotifications(role);
+  const { items, unread, markRead, markAllRead } = useNotifications();
   const [open, setOpen] = useState(false);
 
   return (

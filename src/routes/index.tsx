@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Search, MapPin, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { JobCard } from "@/components/JobCard";
-import { JOBS, JOB_TYPES, AREAS } from "@/lib/jobs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { JOB_TYPES, AREAS, dbJobToJob } from "@/lib/jobs";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,15 +35,28 @@ function Index() {
   const [open, setOpen] = useState(false);
   const active = (type ? 1 : 0) + (area ? 1 : 0);
 
+  const { data: jobs = [], isPending } = useQuery({
+    queryKey: ["jobs", "approved"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data.map(dbJobToJob);
+    },
+  });
+
   const results = useMemo(
     () =>
-      JOBS.filter(
+      jobs.filter(
         (j) =>
           (!type || j.type === type) &&
           (!area || j.area === area) &&
           (j.title + j.company).toLowerCase().includes(q.toLowerCase()),
       ),
-    [q, type, area],
+    [jobs, q, type, area],
   );
 
   return (
@@ -78,7 +94,6 @@ function Index() {
         </div>
       </section>
 
-
       <section className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
         <button
           onClick={() => setOpen((o) => !o)}
@@ -90,7 +105,6 @@ function Index() {
           </span>
           <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
         </button>
-
 
         <div className={`${open ? "grid" : "hidden"} gap-4 pt-4 sm:grid sm:pt-0`}>
           <div>
@@ -117,19 +131,27 @@ function Index() {
           </div>
         </div>
 
-        <p className="mt-6 text-sm text-muted-foreground">{results.length} opportunities</p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {results.map((job) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              action={
-                <span className="text-sm font-medium text-primary">View details →</span>
-              }
-            />
-          ))}
-        </div>
-        {results.length === 0 && (
+        <p className="mt-6 text-sm text-muted-foreground">
+          {isPending ? "Loading…" : `${results.length} opportunities`}
+        </p>
+        {isPending ? (
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-48 rounded-2xl" />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {results.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                action={<span className="text-sm font-medium text-primary">View details →</span>}
+              />
+            ))}
+          </div>
+        )}
+        {!isPending && results.length === 0 && (
           <p className="py-16 text-center text-sm text-muted-foreground">
             No openings match your filters yet.
           </p>
@@ -139,15 +161,7 @@ function Index() {
   );
 }
 
-function Chip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
+function Chip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <button
       onClick={onClick}

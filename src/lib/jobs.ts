@@ -1,4 +1,8 @@
-export type JobType = "Full-time" | "Part-time" | "Daily wage" | "Catering" | "Events" | "Internship";
+import { formatDistanceToNow } from "date-fns";
+import type { Tables } from "@/integrations/supabase/types";
+
+export type JobType =
+  "Full-time" | "Part-time" | "Daily wage" | "Catering" | "Events" | "Internship";
 
 export type Job = {
   id: string;
@@ -9,8 +13,35 @@ export type Job = {
   pay: string;
   posted: string;
   tags: string[];
-  status: "pending" | "approved";
+  status: "pending" | "approved" | "rejected";
 };
+
+export type DbJob = Tables<"jobs">;
+
+export function dbJobToJob(row: DbJob): Job {
+  return {
+    id: row.id,
+    title: row.title,
+    company: row.company,
+    area: row.area,
+    type: row.type as JobType,
+    pay: row.pay,
+    posted: formatDistanceToNow(new Date(row.created_at), { addSuffix: true }),
+    tags: row.tags,
+    status: row.status as Job["status"],
+  };
+}
+
+export function dbJobDetail(row: DbJob): JobDetail {
+  return {
+    about: row.about,
+    duties: row.duties,
+    requirements: row.requirements,
+    shift: row.shift,
+    openings: row.openings,
+    contact: row.contact,
+  };
+}
 
 export const JOB_TYPES: JobType[] = [
   "Full-time",
@@ -152,9 +183,19 @@ export const MY_APPLICATIONS: {
   appliedOn: string;
   note: string;
 }[] = [
-  { job: JOBS[0]!, status: "Shortlisted", appliedOn: "12 Aug", note: "HR will call you for timings." },
+  {
+    job: JOBS[0]!,
+    status: "Shortlisted",
+    appliedOn: "12 Aug",
+    note: "HR will call you for timings.",
+  },
   { job: JOBS[1]!, status: "Under review", appliedOn: "11 Aug", note: "Resume received." },
-  { job: JOBS[3]!, status: "Selected", appliedOn: "8 Aug", note: "Report at store on Monday, 4 PM." },
+  {
+    job: JOBS[3]!,
+    status: "Selected",
+    appliedOn: "8 Aug",
+    note: "Report at store on Monday, 4 PM.",
+  },
   { job: JOBS[4]!, status: "Not selected", appliedOn: "5 Aug", note: "Position filled." },
 ];
 
@@ -230,8 +271,13 @@ export type JobDetail = {
 };
 
 const FALLBACK: JobDetail = {
-  about: "A verified local opening in Ernakulam. The employer will share exact site details after shortlisting.",
-  duties: ["Report on time at the assigned location", "Follow the supervisor's instructions", "Maintain workplace safety and hygiene"],
+  about:
+    "A verified local opening in Ernakulam. The employer will share exact site details after shortlisting.",
+  duties: [
+    "Report on time at the assigned location",
+    "Follow the supervisor's instructions",
+    "Maintain workplace safety and hygiene",
+  ],
   requirements: ["Age 18+", "Valid ID proof", "Basic Malayalam or English"],
   shift: "Discussed at interview",
   openings: 2,
@@ -240,15 +286,25 @@ const FALLBACK: JobDetail = {
 
 export const JOB_DETAILS: Record<string, Partial<JobDetail>> = {
   "1": {
-    about: "Malabar Caterers is hiring service staff for the wedding season across Ernakulam venues. Food and travel within the district are covered.",
-    duties: ["Set up buffet counters and seating", "Serve guests during the function", "Clear and pack up after the event"],
-    requirements: ["Neat appearance", "Ability to stand for long hours", "Previous catering work is a plus"],
+    about:
+      "Malabar Caterers is hiring service staff for the wedding season across Ernakulam venues. Food and travel within the district are covered.",
+    duties: [
+      "Set up buffet counters and seating",
+      "Serve guests during the function",
+      "Clear and pack up after the event",
+    ],
+    requirements: [
+      "Neat appearance",
+      "Ability to stand for long hours",
+      "Previous catering work is a plus",
+    ],
     shift: "4 PM – 11 PM",
     openings: 12,
     contact: "+91 98470 22110",
   },
   "2": {
-    about: "Infopark Labs offers a 6-month paid frontend internship with mentorship and a possible full-time offer.",
+    about:
+      "Infopark Labs offers a 6-month paid frontend internship with mentorship and a possible full-time offer.",
     duties: ["Build UI components in React", "Fix bugs and write tests", "Join daily stand-ups"],
     requirements: ["JavaScript and React basics", "Git knowledge", "Final-year student or fresher"],
     shift: "Mon–Fri, 9:30 AM – 6 PM",
@@ -257,7 +313,11 @@ export const JOB_DETAILS: Record<string, Partial<JobDetail>> = {
   },
   "3": {
     about: "Backwater Events needs a setup crew for weekend shows around Fort Kochi.",
-    duties: ["Load and unload equipment", "Assemble stage and lighting rigs", "Dismantle after the show"],
+    duties: [
+      "Load and unload equipment",
+      "Assemble stage and lighting rigs",
+      "Dismantle after the show",
+    ],
     requirements: ["Physically fit", "Comfortable with night shifts"],
     shift: "6 PM – 2 AM",
     openings: 8,

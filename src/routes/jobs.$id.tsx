@@ -1,19 +1,51 @@
+import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { MapPin, Wallet, Clock, Users, CalendarClock, Phone, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  MapPin,
+  Wallet,
+  Clock,
+  Users,
+  CalendarClock,
+  Phone,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getJob, jobDetail } from "@/lib/jobs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { dbJobToJob, dbJobDetail } from "@/lib/jobs";
+import { useSession, useRole } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { SaveButton } from "@/components/SaveButton";
 
 export const Route = createFileRoute("/jobs/$id")({
-  loader: ({ params }) => {
-    const job = getJob(params.id);
-    if (!job) throw notFound();
-    return { job, detail: jobDetail(params.id) };
+  loader: async ({ params }) => {
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("*")
+      .eq("id", params.id)
+      .maybeSingle();
+    if (error || !data) throw notFound();
+    return { job: dbJobToJob(data), detail: dbJobDetail(data) };
   },
   head: ({ loaderData }) => {
     if (!loaderData)
-      return { meta: [{ title: "Job unavailable — KochiWorks" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [{ title: "Job unavailable — KochiWorks" }, { name: "robots", content: "noindex" }],
+      };
     const { job } = loaderData;
     const title = `${job.title} at ${job.company} — KochiWorks`;
     const description = `${job.type} role in ${job.area}, Ernakulam · ${job.pay}. Apply on KochiWorks.`;
@@ -30,7 +62,9 @@ export const Route = createFileRoute("/jobs/$id")({
   notFoundComponent: () => (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <h1 className="font-display text-xl font-bold">Job not found</h1>
-      <p className="mt-2 text-sm text-muted-foreground">This opening may have been filled or removed.</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        This opening may have been filled or removed.
+      </p>
       <Button asChild className="mt-6 rounded-xl">
         <Link to="/">Browse jobs</Link>
       </Button>
@@ -57,13 +91,19 @@ function JobDetailPage() {
           </Badge>
           <SaveButton id={job.id} />
         </div>
-        <h1 className="mt-3 font-display text-2xl font-bold leading-snug sm:text-3xl">{job.title}</h1>
+        <h1 className="mt-3 font-display text-2xl font-bold leading-snug sm:text-3xl">
+          {job.title}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">{job.company}</p>
 
         <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
           <Fact icon={MapPin} label="Location" value={`${job.area}, Ernakulam`} />
           <Fact icon={Wallet} label="Pay" value={job.pay} />
-          <Fact icon={CalendarClock} label="Shift" value={detail.shift} />
+          <Fact
+            icon={CalendarClock}
+            label="Shift"
+            value={detail.shift || "Discussed at interview"}
+          />
           <Fact icon={Users} label="Openings" value={`${detail.openings}`} />
           <Fact icon={Clock} label="Posted" value={job.posted} />
           <Fact icon={Phone} label="Contact" value={detail.contact} />
@@ -72,38 +112,165 @@ function JobDetailPage() {
 
       <section className="mt-5 grid gap-5 rounded-2xl border border-border bg-card p-5">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">About the job</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            About the job
+          </h2>
           <p className="mt-2 text-sm leading-relaxed text-foreground">{detail.about}</p>
         </div>
-        <List title="What you'll do" items={detail.duties} />
-        <List title="Requirements" items={detail.requirements} />
-        <div className="flex flex-wrap gap-2">
-          {job.tags.map((t: string) => (
-            <span key={t} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-              {t}
-            </span>
-          ))}
-        </div>
+        {detail.duties.length > 0 && <List title="What you'll do" items={detail.duties} />}
+        {detail.requirements.length > 0 && (
+          <List title="Requirements" items={detail.requirements} />
+        )}
+        {job.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {job.tags.map((t: string) => (
+              <span
+                key={t}
+                className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
       </section>
 
       <div className="sticky bottom-4 mt-6">
-        <Button size="lg" className="w-full rounded-xl shadow-lg">
-          Apply now
-        </Button>
+        <ApplyButton jobId={job.id} />
       </div>
     </div>
   );
 }
 
-function Fact({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof MapPin;
-  label: string;
-  value: string;
-}) {
+function ApplyButton({ jobId }: { jobId: string }) {
+  const session = useSession();
+  const role = useRole();
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const { data: existing, isPending: checkingApplied } = useQuery({
+    queryKey: ["myApplication", jobId, userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("applications")
+        .select("id")
+        .eq("job_id", jobId)
+        .eq("applicant_id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId && role === "seeker",
+  });
+
+  const apply = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("applications").insert({
+        job_id: jobId,
+        applicant_id: userId!,
+        applicant_name: name,
+        applicant_phone: phone,
+        applicant_email: session!.user.email ?? "",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Application submitted");
+      setOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["myApplication", jobId, userId] });
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Something went wrong"),
+  });
+
+  if (!session) {
+    return (
+      <Button asChild size="lg" className="w-full rounded-xl shadow-lg">
+        <Link to="/login">Sign in to apply</Link>
+      </Button>
+    );
+  }
+
+  if (role !== "seeker") {
+    return (
+      <Button size="lg" className="w-full rounded-xl shadow-lg" disabled>
+        Only job seekers can apply
+      </Button>
+    );
+  }
+
+  if (checkingApplied) {
+    return (
+      <Button size="lg" className="w-full rounded-xl shadow-lg" disabled>
+        <Loader2 className="h-4 w-4 animate-spin" />
+      </Button>
+    );
+  }
+
+  if (existing) {
+    return (
+      <Button size="lg" className="w-full rounded-xl shadow-lg" disabled>
+        <CheckCircle2 className="h-4 w-4" /> Applied
+      </Button>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="lg" className="w-full rounded-xl shadow-lg">
+          Apply now
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Apply for this job</DialogTitle>
+          <DialogDescription>
+            Share your contact details so the employer can reach you.
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            apply.mutate();
+          }}
+        >
+          <div className="grid gap-2">
+            <Label htmlFor="apply-name">Your name</Label>
+            <Input
+              id="apply-name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Full name"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="apply-phone">Phone number</Label>
+            <Input
+              id="apply-phone"
+              required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+91 90000 00000"
+            />
+          </div>
+          <DialogFooter>
+            <Button type="submit" disabled={apply.isPending} className="rounded-xl">
+              {apply.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Submit application
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function Fact({ icon: Icon, label, value }: { icon: typeof MapPin; label: string; value: string }) {
   return (
     <div className="flex items-start gap-2.5">
       <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -118,7 +285,9 @@ function Fact({
 function List({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h2>
       <ul className="mt-2 grid gap-2">
         {items.map((i) => (
           <li key={i} className="flex gap-2 text-sm text-foreground">
