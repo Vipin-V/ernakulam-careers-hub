@@ -147,16 +147,18 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
         </Button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-muted-foreground">
-        {mode === "signin" ? "New to KochiWorks?" : "Already have an account?"}{" "}
-        <Link
-          to={mode === "signin" ? "/signup" : "/signin"}
-          search={{ role }}
-          className="font-medium text-primary hover:underline"
-        >
-          {mode === "signin" ? "Create an account" : "Sign in"}
-        </Link>
-      </p>
+      {role !== "admin" && (
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          {mode === "signin" ? "New to KochiWorks?" : "Already have an account?"}{" "}
+          <Link
+            to={mode === "signin" ? "/signup" : "/signin"}
+            search={{ role }}
+            className="font-medium text-primary hover:underline"
+          >
+            {mode === "signin" ? "Create an account" : "Sign in"}
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

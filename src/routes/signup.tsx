@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AuthForm } from "@/components/AuthForm";
 import type { Role } from "@/lib/auth";
 
-const ROLES: Role[] = ["seeker", "hr", "admin"];
+const ROLES: Role[] = ["seeker", "hr"];
 
 export const Route = createFileRoute("/signup")({
   validateSearch: (search: Record<string, unknown>): { role: Role } => ({
