@@ -5,6 +5,16 @@ import { Mail, Phone, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { STATUS_STYLE, type AppStatus, type DbJob } from "@/lib/jobs";
 import { useRequireRole } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,6 +69,11 @@ function ApplicantsPage() {
   const authorized = useRequireRole(["hr"]);
   const queryClient = useQueryClient();
   const [jobFilter, setJobFilter] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<{
+    id: string;
+    status: "Shortlisted" | "Selected";
+    applicantName: string;
+  } | null>(null);
 
   const { data: applicants = [], isPending } = useQuery({
     queryKey: ["myApplicants"],
@@ -79,6 +94,7 @@ function ApplicantsPage() {
     },
     onSuccess: () => {
       toast.success("Status updated");
+      setPendingAction(null);
       queryClient.invalidateQueries({ queryKey: ["myApplicants"] });
     },
     onError: (err) => toast.error(err instanceof Error ? err.message : "Something went wrong"),
@@ -159,7 +175,9 @@ function ApplicantsPage() {
                   variant="secondary"
                   className="h-10 rounded-full"
                   disabled={setStatus.isPending}
-                  onClick={() => setStatus.mutate({ id: a.id, status: "Shortlisted" })}
+                  onClick={() =>
+                    setPendingAction({ id: a.id, status: "Shortlisted", applicantName: a.applicant_name })
+                  }
                 >
                   Shortlist
                 </Button>
@@ -167,7 +185,9 @@ function ApplicantsPage() {
                   size="sm"
                   className="h-10 rounded-full"
                   disabled={setStatus.isPending}
-                  onClick={() => setStatus.mutate({ id: a.id, status: "Selected" })}
+                  onClick={() =>
+                    setPendingAction({ id: a.id, status: "Selected", applicantName: a.applicant_name })
+                  }
                 >
                   Select
                 </Button>
@@ -187,6 +207,36 @@ function ApplicantsPage() {
       {!isPending && list.length === 0 && (
         <p className="py-16 text-center text-sm text-muted-foreground">No applicants yet.</p>
       )}
+
+      <AlertDialog open={!!pendingAction} onOpenChange={(open) => !open && setPendingAction(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingAction?.status === "Shortlisted" ? "Shortlist" : "Select"} this applicant?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingAction && (
+                <>
+                  Mark <strong>{pendingAction.applicantName}</strong> as{" "}
+                  {pendingAction.status === "Shortlisted" ? "shortlisted" : "selected"}?
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={setStatus.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (pendingAction) setStatus.mutate(pendingAction);
+              }}
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
