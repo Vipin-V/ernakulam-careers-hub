@@ -32,6 +32,11 @@ export function JobCard({ job, action }: { job: Job; action?: React.ReactNode })
                 <FileCheck2 className="h-3 w-3" /> CV required
               </Badge>
             )}
+            {job.applicationsClosed && (
+              <Badge variant="outline" className="rounded-full border-destructive/40 text-destructive">
+                Applications closed
+              </Badge>
+            )}
           </div>
 
           <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">

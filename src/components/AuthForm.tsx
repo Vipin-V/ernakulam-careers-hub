@@ -30,6 +30,11 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const trimmedCompany = company.trim();
+    if (isHrSignup && !trimmedCompany) {
+      toast.error("Company / organization name is required");
+      return;
+    }
     setBusy(true);
     try {
       if (mode === "signup") {
@@ -38,7 +43,7 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: isHrSignup ? { role, company } : { role },
+            data: isHrSignup ? { role, company: trimmedCompany } : { role },
           },
         });
         if (error) throw error;
@@ -48,7 +53,7 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
         }
         if (isHrSignup) {
           const { error: companyError } = await supabase.rpc("set_own_company", {
-            _company: company,
+            _company: trimmedCompany,
           });
           if (companyError) throw companyError;
         }

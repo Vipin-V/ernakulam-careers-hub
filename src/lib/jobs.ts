@@ -15,6 +15,7 @@ export type Job = {
   tags: string[];
   status: "pending" | "approved" | "rejected";
   requiresResume: boolean;
+  applicationsClosed: boolean;
 };
 
 export type DbJob = Tables<"jobs">;
@@ -31,6 +32,7 @@ export function dbJobToJob(row: DbJob): Job {
     tags: row.tags,
     status: row.status as Job["status"],
     requiresResume: row.requires_resume,
+    applicationsClosed: row.applications_closed,
   };
 }
 
@@ -77,6 +79,7 @@ export const JOBS: Job[] = [
     tags: ["Immediate", "Food provided"],
     status: "approved",
     requiresResume: false,
+    applicationsClosed: false,
   },
   {
     id: "2",
@@ -89,6 +92,7 @@ export const JOBS: Job[] = [
     tags: ["React", "6 months"],
     status: "approved",
     requiresResume: false,
+    applicationsClosed: false,
   },
   {
     id: "3",
@@ -101,6 +105,7 @@ export const JOBS: Job[] = [
     tags: ["Weekend", "Night shift"],
     status: "approved",
     requiresResume: false,
+    applicationsClosed: false,
   },
   {
     id: "4",
@@ -113,6 +118,7 @@ export const JOBS: Job[] = [
     tags: ["Evening shift"],
     status: "approved",
     requiresResume: false,
+    applicationsClosed: false,
   },
   {
     id: "5",
@@ -125,6 +131,7 @@ export const JOBS: Job[] = [
     tags: ["Physical work"],
     status: "approved",
     requiresResume: false,
+    applicationsClosed: false,
   },
   {
     id: "6",
@@ -137,6 +144,7 @@ export const JOBS: Job[] = [
     tags: ["Tally", "2+ yrs"],
     status: "approved",
     requiresResume: false,
+    applicationsClosed: false,
   },
 ];
 
@@ -152,6 +160,7 @@ export const PENDING_JOBS: Job[] = [
     tags: ["Bulk hiring"],
     status: "pending",
     requiresResume: false,
+    applicationsClosed: false,
   },
   {
     id: "p2",
@@ -164,6 +173,7 @@ export const PENDING_JOBS: Job[] = [
     tags: ["Remote friendly"],
     status: "pending",
     requiresResume: false,
+    applicationsClosed: false,
   },
   {
     id: "p3",
@@ -176,6 +186,7 @@ export const PENDING_JOBS: Job[] = [
     tags: ["Own bike"],
     status: "pending",
     requiresResume: false,
+    applicationsClosed: false,
   },
 ];
 

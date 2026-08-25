@@ -45,6 +45,7 @@ export type Database = {
           posted_by: string;
           created_at: string;
           requires_resume: boolean;
+          applications_closed: boolean;
         };
         Insert: {
           id?: string;
@@ -64,6 +65,7 @@ export type Database = {
           posted_by: string;
           created_at?: string;
           requires_resume?: boolean;
+          applications_closed?: boolean;
         };
         Update: {
           id?: string;
@@ -83,6 +85,7 @@ export type Database = {
           posted_by?: string;
           created_at?: string;
           requires_resume?: boolean;
+          applications_closed?: boolean;
         };
         Relationships: [];
       };
@@ -204,6 +207,13 @@ export type Database = {
       set_own_company: {
         Args: {
           _company: string;
+        };
+        Returns: undefined;
+      };
+      set_applications_closed: {
+        Args: {
+          _job_id: string;
+          _closed: boolean;
         };
         Returns: undefined;
       };

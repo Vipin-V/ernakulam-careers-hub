@@ -70,6 +70,21 @@ function PostPage() {
     enabled: !!userId,
   });
 
+  const setApplicationsClosed = useMutation({
+    mutationFn: async ({ id, closed }: { id: string; closed: boolean }) => {
+      const { error } = await supabase.rpc("set_applications_closed", {
+        _job_id: id,
+        _closed: closed,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_data, { closed }) => {
+      toast.success(closed ? "Applications closed" : "Applications reopened");
+      queryClient.invalidateQueries({ queryKey: ["myJobs", userId] });
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Something went wrong"),
+  });
+
   const submitJob = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("jobs").insert({
@@ -231,11 +246,32 @@ function PostPage() {
                   key={job.id}
                   job={job}
                   action={
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${meta.className}`}
-                    >
-                      {meta.label}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${meta.className}`}
+                      >
+                        {meta.label}
+                      </span>
+                      {job.status === "approved" && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={job.applicationsClosed ? "secondary" : "outline"}
+                          className="h-7 rounded-full px-3 text-xs"
+                          disabled={setApplicationsClosed.isPending}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setApplicationsClosed.mutate({
+                              id: job.id,
+                              closed: !job.applicationsClosed,
+                            });
+                          }}
+                        >
+                          {job.applicationsClosed ? "Reopen applications" : "Close applications"}
+                        </Button>
+                      )}
+                    </div>
                   }
                 />
               );

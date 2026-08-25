@@ -148,7 +148,11 @@ function JobDetailPage() {
       </section>
 
       <div className="sticky bottom-4 mt-6">
-        <ApplyButton jobId={job.id} requiresResume={job.requiresResume} />
+        <ApplyButton
+          jobId={job.id}
+          requiresResume={job.requiresResume}
+          applicationsClosed={job.applicationsClosed}
+        />
       </div>
     </div>
   );
@@ -156,7 +160,15 @@ function JobDetailPage() {
 
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 
-function ApplyButton({ jobId, requiresResume }: { jobId: string; requiresResume: boolean }) {
+function ApplyButton({
+  jobId,
+  requiresResume,
+  applicationsClosed,
+}: {
+  jobId: string;
+  requiresResume: boolean;
+  applicationsClosed: boolean;
+}) {
   const session = useSession();
   const role = useRole();
   const userId = session?.user.id;
@@ -239,6 +251,14 @@ function ApplyButton({ jobId, requiresResume }: { jobId: string; requiresResume:
     return (
       <Button size="lg" className="w-full rounded-xl shadow-lg" disabled>
         <CheckCircle2 className="h-4 w-4" /> Applied
+      </Button>
+    );
+  }
+
+  if (applicationsClosed) {
+    return (
+      <Button size="lg" className="w-full rounded-xl shadow-lg" disabled>
+        Applications closed
       </Button>
     );
   }
