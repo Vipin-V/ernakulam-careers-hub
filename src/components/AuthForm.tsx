@@ -12,7 +12,7 @@ export const ROLE_META: Record<
   Role,
   { label: string; hint: string; icon: typeof User; to: string }
 > = {
-  seeker: { label: "Job seeker", hint: "Apply and track status", icon: User, to: "/" },
+  seeker: { label: "Job seeker", hint: "Apply and track status", icon: User, to: "/jobs" },
   hr: { label: "HR / Employer", hint: "Post jobs, view applicants", icon: Briefcase, to: "/post" },
   admin: { label: "Admin", hint: "Approve postings", icon: ShieldCheck, to: "/admin" },
 };

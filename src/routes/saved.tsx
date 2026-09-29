@@ -67,7 +67,7 @@ function SavedPage() {
             Tap the bookmark icon on any job to keep it here.
           </p>
           <Button asChild className="mt-6 rounded-xl">
-            <Link to="/">Browse jobs</Link>
+            <Link to="/jobs">Browse jobs</Link>
           </Button>
         </div>
       )}

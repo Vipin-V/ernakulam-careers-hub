@@ -68,7 +68,7 @@ export const Route = createFileRoute("/jobs/$id")({
         This opening may have been filled or removed.
       </p>
       <Button asChild className="mt-6 rounded-xl">
-        <Link to="/">Browse jobs</Link>
+        <Link to="/jobs">Browse jobs</Link>
       </Button>
     </div>
   ),
@@ -80,7 +80,7 @@ function JobDetailPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
       <Link
-        to="/"
+        to="/jobs"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> All jobs

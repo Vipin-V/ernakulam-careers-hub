@@ -8,7 +8,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const NAV: { to: string; label: string; roles: (Role | "guest")[] }[] = [
-  { to: "/", label: "Find jobs", roles: ["guest", "seeker", "hr", "admin"] },
+  { to: "/jobs", label: "Find jobs", roles: ["guest", "seeker", "hr", "admin"] },
   { to: "/saved", label: "Saved", roles: ["guest", "seeker"] },
   { to: "/applications", label: "My applications", roles: ["seeker"] },
   { to: "/post", label: "Post a job", roles: ["hr"] },
@@ -47,7 +47,7 @@ export function SiteHeader() {
         {/* Desktop */}
         <nav className="hidden items-center gap-1 text-sm md:flex">
           {items.map((n) => (
-            <Link key={n.to} to={n.to} activeOptions={{ exact: n.to === "/" }} className={linkCls}>
+            <Link key={n.to} to={n.to} activeOptions={{ exact: n.to === "/jobs" }} className={linkCls}>
               {n.label}
             </Link>
           ))}
@@ -84,7 +84,7 @@ export function SiteHeader() {
                 <Link
                   key={n.to}
                   to={n.to}
-                  activeOptions={{ exact: n.to === "/" }}
+                  activeOptions={{ exact: n.to === "/jobs" }}
                   onClick={() => setOpen(false)}
                   className={linkCls + " px-4 py-3"}
                 >

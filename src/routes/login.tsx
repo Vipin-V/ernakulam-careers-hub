@@ -18,7 +18,7 @@ export const Route = createFileRoute("/login")({
 });
 
 export const ROLES: { id: Role; label: string; hint: string; icon: typeof User; to: string }[] = [
-  { id: "seeker", label: "Job seeker", hint: "Apply and track status", icon: User, to: "/" },
+  { id: "seeker", label: "Job seeker", hint: "Apply and track status", icon: User, to: "/jobs" },
   { id: "hr", label: "HR / Employer", hint: "Post jobs, view applicants", icon: Briefcase, to: "/post" },
   { id: "admin", label: "Admin", hint: "Approve postings", icon: ShieldCheck, to: "/admin" },
 ];
