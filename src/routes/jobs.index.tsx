@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { JOB_TYPES, AREAS, dbJobToJob } from "@/lib/jobs";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/jobs/")({
   head: () => ({
     meta: [
       { title: "Jobs in Ernakulam — KochiWorks" },
