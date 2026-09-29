@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ApplicantsRouteImport } from './routes/applicants'
 import { Route as ApplicationsRouteImport } from './routes/applications'
@@ -19,13 +18,9 @@ import { Route as SavedRouteImport } from './routes/saved'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -71,6 +66,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JobsIndexRoute = JobsIndexRouteImport.update({
+  id: '/jobs/',
+  path: '/jobs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsIdRoute = JobsIdRouteImport.update({
   id: '/jobs/$id',
   path: '/jobs/$id',
@@ -78,7 +78,6 @@ const JobsIdRoute = JobsIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/applicants': typeof ApplicantsRoute
   '/applications': typeof ApplicationsRoute
@@ -89,9 +88,9 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/jobs/': typeof JobsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/applicants': typeof ApplicantsRoute
   '/applications': typeof ApplicationsRoute
@@ -102,10 +101,10 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/jobs': typeof JobsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/applicants': typeof ApplicantsRoute
   '/applications': typeof ApplicationsRoute
@@ -116,11 +115,11 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/jobs/': typeof JobsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/admin'
     | '/applicants'
     | '/applications'
@@ -131,9 +130,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/auth/callback'
     | '/jobs/$id'
+    | '/jobs/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/admin'
     | '/applicants'
     | '/applications'
@@ -144,9 +143,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/auth/callback'
     | '/jobs/$id'
+    | '/jobs'
   id:
     | '__root__'
-    | '/'
     | '/admin'
     | '/applicants'
     | '/applications'
@@ -157,10 +156,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/auth/callback'
     | '/jobs/$id'
+    | '/jobs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   ApplicantsRoute: typeof ApplicantsRoute
   ApplicationsRoute: typeof ApplicationsRoute
@@ -171,17 +170,11 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   JobsIdRoute: typeof JobsIdRoute
+  JobsIndexRoute: typeof JobsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -245,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jobs/': {
+      id: '/jobs/'
+      path: '/jobs'
+      fullPath: '/jobs/'
+      preLoaderRoute: typeof JobsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs/$id': {
       id: '/jobs/$id'
       path: '/jobs/$id'
@@ -256,7 +256,6 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ApplicantsRoute: ApplicantsRoute,
   ApplicationsRoute: ApplicationsRoute,
@@ -267,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   JobsIdRoute: JobsIdRoute,
+  JobsIndexRoute: JobsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
