@@ -125,7 +125,7 @@ export function AuthForm({ mode, role }: { mode: "signin" | "signup"; role: Role
               id="password"
               type={showPw ? "text" : "password"}
               required
-              minLength={4}
+              minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
