@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ApplicantsRouteImport } from './routes/applicants'
 import { Route as ApplicationsRouteImport } from './routes/applications'
@@ -21,6 +22,11 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -78,6 +84,7 @@ const JobsIdRoute = JobsIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/applicants': typeof ApplicantsRoute
   '/applications': typeof ApplicationsRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/jobs/': typeof JobsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/applicants': typeof ApplicantsRoute
   '/applications': typeof ApplicationsRoute
@@ -105,6 +113,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/applicants': typeof ApplicantsRoute
   '/applications': typeof ApplicationsRoute
@@ -120,6 +129,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/admin'
     | '/applicants'
     | '/applications'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/jobs/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/admin'
     | '/applicants'
     | '/applications'
@@ -146,6 +157,7 @@ export interface FileRouteTypes {
     | '/jobs'
   id:
     | '__root__'
+    | '/'
     | '/admin'
     | '/applicants'
     | '/applications'
@@ -160,6 +172,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   ApplicantsRoute: typeof ApplicantsRoute
   ApplicationsRoute: typeof ApplicationsRoute
@@ -175,6 +188,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -256,6 +276,7 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ApplicantsRoute: ApplicantsRoute,
   ApplicationsRoute: ApplicationsRoute,
