@@ -1,0 +1,2 @@
+revoke execute on function public.has_role(uuid, app_role), public.set_own_company(text), public.set_applications_closed(uuid, boolean), public.handle_new_user(), public.notify_job_status(), public.notify_application() from public, anon;
+revoke execute on function public.handle_new_user(), public.notify_job_status(), public.notify_application() from authenticated;
