@@ -166,10 +166,35 @@ function ApplicantsPage() {
   const count = (t: (typeof TABS)[number]) => (t === "All" ? base.length : base.filter((a) => a.status === t).length);
   const list = tab === "All" ? base : base.filter((a) => a.status === tab);
 
+  const saveNote = async (id: string, hr_notes: string) => {
+    const { error } = await supabase.from("applications").update({ hr_notes }).eq("id", id);
+    if (error) return toast.error("Couldn't save note");
+    toast.success("Note saved");
+    queryClient.invalidateQueries({ queryKey: ["myApplicants"] });
+  };
+
+  const exportCsv = () => {
+    const csv = toCsv([
+      ["Name", "Phone", "Email", "Job", "Status", "Locality", "Availability", "Own vehicle", "Note", "Applied"],
+      ...list.map((a) => [a.applicant_name, a.applicant_phone, a.applicant_email, a.jobs.title, a.status, a.locality, a.availability, a.has_vehicle ? "Yes" : "No", a.hr_notes, new Date(a.applied_at).toLocaleDateString()]),
+    ]);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    link.download = `applicants-${tab.toLowerCase().replace(/\s+/g, "-")}.csv`;
+    link.click();
+  };
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 sm:py-10">
-      <h1 className="font-display text-3xl font-bold tracking-tight">Applicants</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{applicants.length} people applied to your openings.</p>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-bold tracking-tight">Applicants</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{applicants.length} people applied to your openings.</p>
+        </div>
+        <Button variant="secondary" className="h-10 rounded-full" onClick={exportCsv} disabled={!list.length}>
+          <Download className="h-4 w-4" /> <span className="hidden sm:inline">Export</span>
+        </Button>
+      </div>
 
       <div className="sticky top-14 z-10 -mx-4 mt-5 space-y-3 bg-background/80 px-4 py-3 backdrop-blur-xl">
         <div className="relative">
@@ -228,7 +253,7 @@ function ApplicantsPage() {
       ) : list.length ? (
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {list.map((a) => (
-            <ApplicantCard key={a.id} a={a} onStatus={(status) => setStatus.mutate({ id: a.id, status })} />
+            <ApplicantCard key={a.id} a={a} onStatus={(status) => setStatus.mutate({ id: a.id, status })} onNote={(n) => saveNote(a.id, n)} />
           ))}
         </div>
       ) : (
