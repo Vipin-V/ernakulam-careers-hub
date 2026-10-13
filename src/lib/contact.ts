@@ -9,3 +9,8 @@ export function whatsappLink(phone: string, name: string, company: string, jobTi
   const text = `Hi ${first}, this is ${company} regarding your application for ${jobTitle} on KochiWorks. Are you available for a quick chat?`;
   return `https://wa.me/${toIntlPhone(phone)}?text=${encodeURIComponent(text)}`;
 }
+
+/** Build a CSV string, quoting every cell so commas/quotes/newlines are safe. */
+export function toCsv(rows: (string | number | boolean)[][]) {
+  return rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+}
