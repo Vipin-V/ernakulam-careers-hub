@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+const AVAILABILITY = ["Immediately", "This week", "This month"] as const;
 import {
   Dialog,
   DialogContent,
@@ -177,6 +179,9 @@ function ApplyButton({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [resume, setResume] = useState<File | null>(null);
+  const [locality, setLocality] = useState("");
+  const [availability, setAvailability] = useState<string>(AVAILABILITY[0]);
+  const [vehicle, setVehicle] = useState(false);
 
   const { data: existing, isPending: checkingApplied } = useQuery({
     queryKey: ["myApplication", jobId, userId],
@@ -211,6 +216,9 @@ function ApplyButton({
         applicant_phone: phone,
         applicant_email: session!.user.email ?? "",
         resume_url: resumeUrl,
+        locality,
+        availability,
+        has_vehicle: vehicle,
       });
       if (error) throw error;
     },
@@ -337,6 +345,35 @@ function ApplyButton({
               placeholder="+91 90000 00000"
             />
           </div>
+          <div className="grid gap-2">
+            <Label htmlFor="apply-locality">Where do you live?</Label>
+            <Input
+              id="apply-locality"
+              required
+              value={locality}
+              onChange={(e) => setLocality(e.target.value)}
+              placeholder="e.g. Kakkanad"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>When can you start?</Label>
+            <div className="grid grid-cols-3 gap-1 rounded-xl bg-muted/70 p-1">
+              {AVAILABILITY.map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() => setAvailability(a)}
+                  className={`h-9 rounded-lg text-xs font-medium transition-all ${availability === a ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+          </div>
+          <label className="flex min-h-11 cursor-pointer items-center justify-between rounded-xl bg-muted/50 px-3 text-sm">
+            I have my own vehicle
+            <input type="checkbox" checked={vehicle} onChange={(e) => setVehicle(e.target.checked)} className="h-5 w-5 accent-primary" />
+          </label>
           <DialogFooter>
             <Button type="submit" disabled={apply.isPending} className="rounded-xl">
               {apply.isPending && <Loader2 className="h-4 w-4 animate-spin" />}

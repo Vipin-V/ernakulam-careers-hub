@@ -21,8 +21,12 @@ export type Database = {
           applicant_name: string
           applicant_phone: string
           applied_at: string
+          availability: string
+          has_vehicle: boolean
+          hr_notes: string
           id: string
           job_id: string
+          locality: string
           note: string
           resume_url: string | null
           status: string
@@ -33,8 +37,12 @@ export type Database = {
           applicant_name: string
           applicant_phone: string
           applied_at?: string
+          availability?: string
+          has_vehicle?: boolean
+          hr_notes?: string
           id?: string
           job_id: string
+          locality?: string
           note?: string
           resume_url?: string | null
           status?: string
@@ -45,8 +53,12 @@ export type Database = {
           applicant_name?: string
           applicant_phone?: string
           applied_at?: string
+          availability?: string
+          has_vehicle?: boolean
+          hr_notes?: string
           id?: string
           job_id?: string
+          locality?: string
           note?: string
           resume_url?: string | null
           status?: string
