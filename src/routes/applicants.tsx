@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Mail, Phone, FileText, Loader2, Search, X, MessageCircle, ChevronDown, Check } from "lucide-react";
+import { Mail, Phone, FileText, Loader2, Search, X, MessageCircle, ChevronDown, Check, MapPin, CalendarClock, Bike, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { STATUS_STYLE, type AppStatus, type DbJob } from "@/lib/jobs";
 import { useRequireRole } from "@/lib/auth";
-import { whatsappLink } from "@/lib/contact";
+import { whatsappLink, toCsv } from "@/lib/contact";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -52,7 +52,16 @@ function ResumeLink({ path }: { path: string }) {
   );
 }
 
-function ApplicantCard({ a, onStatus }: { a: ApplicantRow; onStatus: (s: AppStatus) => void }) {
+function Chip({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <span className="inline-flex h-7 items-center gap-1 rounded-full bg-secondary px-2.5 text-xs font-medium text-secondary-foreground">
+      {icon}
+      {children}
+    </span>
+  );
+}
+
+function ApplicantCard({ a, onStatus, onNote }: { a: ApplicantRow; onStatus: (s: AppStatus) => void; onNote: (n: string) => void }) {
   const initials = a.applicant_name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   return (
     <article className="rounded-3xl border border-border/60 bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
@@ -87,6 +96,20 @@ function ApplicantCard({ a, onStatus }: { a: ApplicantRow; onStatus: (s: AppStat
           <Mail className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{a.applicant_email}</span>
         </span>
       </div>
+
+      <div className="mt-3 flex flex-wrap gap-1.5 pl-14">
+        {a.locality && <Chip icon={<MapPin className="h-3 w-3" />}>{a.locality}</Chip>}
+        {a.availability && <Chip icon={<CalendarClock className="h-3 w-3" />}>{a.availability}</Chip>}
+        {a.has_vehicle && <Chip icon={<Bike className="h-3 w-3" />}>Own vehicle</Chip>}
+      </div>
+
+      <textarea
+        defaultValue={a.hr_notes}
+        onBlur={(e) => e.target.value !== a.hr_notes && onNote(e.target.value)}
+        placeholder="Private note — only you can see this"
+        rows={2}
+        className="mt-3 w-full resize-none rounded-2xl bg-muted/60 px-3.5 py-2.5 text-sm outline-none ring-primary/40 placeholder:text-muted-foreground focus:ring-2"
+      />
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:flex">
         <Button asChild className="h-11 rounded-full sm:h-10">
