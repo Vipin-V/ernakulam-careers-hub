@@ -111,7 +111,7 @@ function JobDetailPage() {
         <p className="mt-1 text-sm text-muted-foreground">{job.company}</p>
 
         <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-          <Fact icon={MapPin} label="Location" value={`${job.area}, Ernakulam`} />
+          <Fact icon={MapPin} label="Location" value={[detail.landmark, job.area, "Ernakulam"].filter(Boolean).join(", ")} />
           <Fact icon={Wallet} label="Pay" value={job.pay} />
           <Fact
             icon={CalendarClock}

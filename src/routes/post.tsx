@@ -9,9 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { Building2, FileCheck2 } from "lucide-react";
+import { Building2, FileCheck2, Pencil, Copy, X } from "lucide-react";
 import { JobCard } from "@/components/JobCard";
-import { JOB_TYPES, AREAS, dbJobToJob, type JobType } from "@/lib/jobs";
+import { JOB_TYPES, AREAS, dbJobToJob, type JobType, type DbJob } from "@/lib/jobs";
 import { useRequireRole, useSession, useCompany } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -55,6 +55,23 @@ function PostPage() {
   const [contact, setContact] = useState("");
   const [about, setAbout] = useState("");
   const [requiresResume, setRequiresResume] = useState(false);
+  const [landmark, setLandmark] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const fill = (r: DbJob | null, copy = false) => {
+    setTitle(r ? (copy ? `${r.title} (copy)` : r.title) : "");
+    setType((r?.type as JobType) ?? JOB_TYPES[0]!);
+    setArea(r?.area ?? AREAS[0]!);
+    setPay(r?.pay ?? "");
+    setOpenings(String(r?.openings ?? 1));
+    setShift(r?.shift ?? "");
+    setContact(r?.contact ?? "");
+    setAbout(r?.about ?? "");
+    setLandmark(r?.landmark ?? "");
+    setRequiresResume(r?.requires_resume ?? false);
+    setEditingId(r && !copy ? r.id : null);
+    if (r) window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const { data: myJobs = [], isPending: jobsPending } = useQuery({
     queryKey: ["myJobs", userId],
@@ -65,7 +82,7 @@ function PostPage() {
         .eq("posted_by", userId!)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data.map(dbJobToJob);
+      return data;
     },
     enabled: !!userId,
   });
@@ -87,9 +104,8 @@ function PostPage() {
 
   const submitJob = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("jobs").insert({
+      const fields = {
         title,
-        company: company!,
         type,
         area,
         pay,
@@ -97,20 +113,17 @@ function PostPage() {
         shift,
         contact,
         about,
-        posted_by: userId!,
+        landmark,
         requires_resume: requiresResume,
-      });
+      };
+      const { error } = editingId
+        ? await supabase.from("jobs").update(fields).eq("id", editingId)
+        : await supabase.from("jobs").insert({ ...fields, company: company!, posted_by: userId! });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Submitted for approval");
-      setTitle("");
-      setPay("");
-      setOpenings("1");
-      setShift("");
-      setContact("");
-      setAbout("");
-      setRequiresResume(false);
+      toast.success(editingId ? "Changes saved" : "Submitted for approval");
+      fill(null);
       queryClient.invalidateQueries({ queryKey: ["myJobs", userId] });
     },
     onError: (err) => toast.error(err instanceof Error ? err.message : "Something went wrong"),
@@ -121,7 +134,9 @@ function PostPage() {
   return (
     <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[minmax(0,1fr)_380px]">
       <section>
-        <h1 className="font-display text-2xl font-bold sm:text-3xl">Post an opportunity</h1>
+        <h1 className="font-display text-2xl font-bold sm:text-3xl">
+          {editingId ? "Edit posting" : "Post an opportunity"}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Submissions go to an admin for approval before job seekers see them.
         </p>
@@ -158,6 +173,13 @@ function PostPage() {
               <Select value={area} onChange={setArea} options={AREAS} />
             </Field>
           </div>
+          <Field label="Landmark / exact spot (optional)">
+            <Input
+              value={landmark}
+              onChange={(e) => setLandmark(e.target.value)}
+              placeholder="e.g. Near Lulu Mall, Gate 2"
+            />
+          </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Pay">
               <Input
@@ -219,15 +241,22 @@ function PostPage() {
               </span>
             </span>
           </label>
-          <Button
-            type="submit"
-            size="lg"
-            disabled={submitJob.isPending || !company}
-            className="rounded-xl justify-self-start"
-          >
-            {submitJob.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-            Submit for approval
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={submitJob.isPending || !company}
+              className="rounded-xl"
+            >
+              {submitJob.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {editingId ? "Save changes" : "Submit for approval"}
+            </Button>
+            {editingId && (
+              <Button type="button" size="lg" variant="ghost" className="rounded-xl" onClick={() => fill(null)}>
+                <X className="h-4 w-4" /> Cancel
+              </Button>
+            )}
+          </div>
         </form>
       </section>
 
@@ -239,7 +268,8 @@ function PostPage() {
               <Skeleton key={i} className="h-44 rounded-2xl" />
             ))}
           {!jobsPending &&
-            myJobs.map((job) => {
+            myJobs.map((row) => {
+              const job = dbJobToJob(row);
               const meta = STATUS_META[job.status]!;
               return (
                 <JobCard
@@ -252,6 +282,8 @@ function PostPage() {
                       >
                         {meta.label}
                       </span>
+                      <IconBtn label="Edit" onClick={() => fill(row)}><Pencil className="h-3.5 w-3.5" /></IconBtn>
+                      <IconBtn label="Duplicate" onClick={() => fill(row, true)}><Copy className="h-3.5 w-3.5" /></IconBtn>
                       {job.status === "approved" && (
                         <Button
                           type="button"
@@ -315,5 +347,23 @@ function Select({
         </option>
       ))}
     </select>
+  );
+}
+
+function IconBtn({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick();
+      }}
+      className="grid h-8 w-8 place-items-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground active:opacity-70"
+    >
+      {children}
+    </button>
   );
 }

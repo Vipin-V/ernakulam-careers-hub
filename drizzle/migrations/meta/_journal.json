@@ -8,6 +8,13 @@
       "when": 1791870783506,
       "tag": "0000_phase2_screening",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792048002053,
+      "tag": "0001_phase3_edit_jobs",
+      "breakpoints": true
     }
   ]
 }

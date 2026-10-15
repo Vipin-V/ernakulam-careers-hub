@@ -83,6 +83,7 @@ export type Database = {
           created_at: string
           duties: string[]
           id: string
+          landmark: string
           openings: number
           pay: string
           posted_by: string
@@ -103,6 +104,7 @@ export type Database = {
           created_at?: string
           duties?: string[]
           id?: string
+          landmark?: string
           openings?: number
           pay: string
           posted_by: string
@@ -123,6 +125,7 @@ export type Database = {
           created_at?: string
           duties?: string[]
           id?: string
+          landmark?: string
           openings?: number
           pay?: string
           posted_by?: string
