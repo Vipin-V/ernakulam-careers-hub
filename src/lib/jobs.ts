@@ -44,6 +44,7 @@ export function dbJobDetail(row: DbJob): JobDetail {
     shift: row.shift,
     openings: row.openings,
     contact: row.contact,
+    landmark: row.landmark,
   };
 }
 
@@ -290,6 +291,7 @@ export type JobDetail = {
   shift: string;
   openings: number;
   contact: string;
+  landmark?: string;
 };
 
 const FALLBACK: JobDetail = {
