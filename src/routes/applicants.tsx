@@ -41,7 +41,7 @@ function ResumeLink({ path }: { path: string }) {
     setLoading(true);
     const { data, error } = await supabase.storage.from("resumes").createSignedUrl(path, 60);
     setLoading(false);
-    if (error || !data) return toast.error("Couldn't open resume");
+    if (error || !data) { toast.error("Couldn't open resume"); return; }
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
   return (
@@ -168,7 +168,7 @@ function ApplicantsPage() {
 
   const saveNote = async (id: string, hr_notes: string) => {
     const { error } = await supabase.from("applications").update({ hr_notes }).eq("id", id);
-    if (error) return toast.error("Couldn't save note");
+    if (error) { toast.error("Couldn't save note"); return; }
     toast.success("Note saved");
     queryClient.invalidateQueries({ queryKey: ["myApplicants"] });
   };
