@@ -1,16 +1,9 @@
 # Ernakulam Careers Hub
 
-i want a website where people can find job opportunities  like parttime or fultime, wages, catering, events etc jobs or even internship opportunity this website is only for the region of Ernakulam in kerala currently only implement ui make sure the ui is modern and beautiful and make sure it is responsive to all type of mobile devices use only necessary code and less code, there will be three types of users, the job seeking users, Hr who posts opportunities, and admin who approves the opportuniteies before users gets it
+A local job discovery platform designed to connect job seekers with employers across Ernakulam, Kerala.
 
-This project was built with [Lovable](https://lovable.dev).
+Ernakulam Jobs aims to make finding local employment opportunities easier by bringing different types of jobs and internships together on a single platform. Whether someone is looking for a part-time job, full-time position, daily-wage work, catering opportunities, event-based jobs, or internships, the platform helps them discover opportunities within their region.
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/32d64b3e-05e4-4a02-a542-7f39765f4d68).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
